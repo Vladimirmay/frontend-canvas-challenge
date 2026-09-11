@@ -189,7 +189,11 @@ class GenerationsController {
   }
 }
 
-export function useGenerations(spaceId: string, graphSync: GraphSyncController, pollIntervalMs: number) {
+export function useGenerations(
+  spaceId: string,
+  graphSync: GraphSyncController,
+  pollIntervalMs: number,
+) {
   const controller = useMemo(
     () => new GenerationsController(spaceId, graphSync, pollIntervalMs),
     [spaceId, graphSync, pollIntervalMs],
@@ -199,8 +203,14 @@ export function useGenerations(spaceId: string, graphSync: GraphSyncController, 
 
   const attempts = useSyncExternalStore(controller.subscribe, controller.getSnapshot);
 
-  const generate = useCallback((nodeId: string, scenario: Scenario) => controller.generate(nodeId, scenario), [controller]);
-  const retryAfterNetworkError = useCallback((nodeId: string) => controller.retryAfterNetworkError(nodeId), [controller]);
+  const generate = useCallback(
+    (nodeId: string, scenario: Scenario) => controller.generate(nodeId, scenario),
+    [controller],
+  );
+  const retryAfterNetworkError = useCallback(
+    (nodeId: string) => controller.retryAfterNetworkError(nodeId),
+    [controller],
+  );
 
   return { attempts, generate, retryAfterNetworkError };
 }

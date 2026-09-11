@@ -56,7 +56,11 @@ function SpaceProviderReady({
   children: ReactNode;
 }) {
   const { snapshot: graph, controller: graphController } = useGraphSync(spaceId, config.debounceMs);
-  const { attempts, generate, retryAfterNetworkError } = useGenerations(spaceId, graphController, config.pollIntervalMs);
+  const { attempts, generate, retryAfterNetworkError } = useGenerations(
+    spaceId,
+    graphController,
+    config.pollIntervalMs,
+  );
 
   const resultsByNode = useMemo(() => {
     const index = new Map<string, GenerationData>();
@@ -67,7 +71,15 @@ function SpaceProviderReady({
   }, [attempts]);
 
   const value = useMemo<SpaceContextValue>(
-    () => ({ config, graph, graphController, attempts, resultsByNode, generate, retryAfterNetworkError }),
+    () => ({
+      config,
+      graph,
+      graphController,
+      attempts,
+      resultsByNode,
+      generate,
+      retryAfterNetworkError,
+    }),
     [config, graph, graphController, attempts, resultsByNode, generate, retryAfterNetworkError],
   );
 

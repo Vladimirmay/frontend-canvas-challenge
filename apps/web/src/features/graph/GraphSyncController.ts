@@ -148,7 +148,9 @@ export class GraphSyncController {
   removeNodesCascade(deletedIds: Set<string>): void {
     if (!this.ready || deletedIds.size === 0) return;
     this.nodes = this.nodes.filter((node) => !deletedIds.has(node.id));
-    this.edges = this.edges.filter((edge) => !deletedIds.has(edge.source) && !deletedIds.has(edge.target));
+    this.edges = this.edges.filter(
+      (edge) => !deletedIds.has(edge.source) && !deletedIds.has(edge.target),
+    );
     this.markDirty();
   }
 
@@ -167,7 +169,8 @@ export class GraphSyncController {
 
   /** Cancels any pending debounce and saves immediately; used before starting a generation. */
   async flush(): Promise<SaveResult> {
-    if (!this.ready) return { ok: false, error: new ApiError('GRAPH_NOT_READY', 'Граф ещё не загружен.') };
+    if (!this.ready)
+      return { ok: false, error: new ApiError('GRAPH_NOT_READY', 'Граф ещё не загружен.') };
     this.debouncer.cancel();
     return this.ensureSaved();
   }
@@ -205,7 +208,10 @@ export class GraphSyncController {
       if (this.conflictDraft !== null) {
         return {
           ok: false,
-          error: new ApiError('GRAPH_VERSION_CONFLICT', 'Граф изменился на сервере. Перечитайте его перед продолжением.'),
+          error: new ApiError(
+            'GRAPH_VERSION_CONFLICT',
+            'Граф изменился на сервере. Перечитайте его перед продолжением.',
+          ),
         };
       }
       if (!this.dirty) return { ok: true };
@@ -217,7 +223,8 @@ export class GraphSyncController {
 
   private async doSave(): Promise<SaveResult> {
     const etag = this.committedEtag;
-    if (!etag) return { ok: false, error: new ApiError('PRECONDITION_REQUIRED', 'Граф ещё не загружен.') };
+    if (!etag)
+      return { ok: false, error: new ApiError('PRECONDITION_REQUIRED', 'Граф ещё не загружен.') };
 
     const raw = JSON.stringify(toPersistedGraph(this.nodes, this.edges, this.viewport));
     this.dirty = false;
@@ -258,7 +265,11 @@ export class GraphSyncController {
    * real conflict — surfaced exactly like a 412, never silently retried, so a lost response can
    * never end up clobbering someone else's concurrent save.
    */
-  private async recoverFromLostResponse(sentRaw: string, sentEtag: string, original: ApiError): Promise<SaveResult> {
+  private async recoverFromLostResponse(
+    sentRaw: string,
+    sentEtag: string,
+    original: ApiError,
+  ): Promise<SaveResult> {
     try {
       const server = await getGraph(this.spaceId);
       this.committedEtag = server.etag;
@@ -276,7 +287,10 @@ export class GraphSyncController {
         this.emit();
         return { ok: false, error: original };
       }
-      const conflict = new ApiError('GRAPH_VERSION_CONFLICT', 'Граф изменился на сервере, пока соединение было потеряно.');
+      const conflict = new ApiError(
+        'GRAPH_VERSION_CONFLICT',
+        'Граф изменился на сервере, пока соединение было потеряно.',
+      );
       this.conflictDraft = sentRaw;
       this.dirty = true;
       this.error = conflict;

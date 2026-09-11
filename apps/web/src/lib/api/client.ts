@@ -1,7 +1,8 @@
 import { ApiError } from './errors';
 import { isAbortError } from '../async/abort';
 
-const BASE_URL = (import.meta.env.VITE_API_BASE_URL as string | undefined) ?? 'http://127.0.0.1:4001';
+const BASE_URL =
+  (import.meta.env.VITE_API_BASE_URL as string | undefined) ?? 'http://127.0.0.1:4001';
 
 export interface ApiRequestOptions {
   method?: 'GET' | 'POST' | 'PUT';
@@ -31,7 +32,10 @@ interface ErrorBody {
  * parsing, and error normalization all happen here exactly once. Callers always get parsed
  * data or a thrown ApiError — never a raw Response or a bespoke try/catch around fetch.
  */
-export async function apiRequest<T>(path: string, options: ApiRequestOptions = {}): Promise<ApiResponse<T>> {
+export async function apiRequest<T>(
+  path: string,
+  options: ApiRequestOptions = {},
+): Promise<ApiResponse<T>> {
   const { method = 'GET', body, rawBody, headers, signal } = options;
   const hasBody = rawBody !== undefined || body !== undefined;
 

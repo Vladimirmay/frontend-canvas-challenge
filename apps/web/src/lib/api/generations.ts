@@ -2,8 +2,13 @@ import type { GenerationData, GenerationRequest } from '@canvas/contracts';
 import { apiRequest } from './client';
 
 /** Already newest-first from the server — do not re-sort. */
-export async function listGenerations(spaceId: string, signal?: AbortSignal): Promise<GenerationData[]> {
-  const { data } = await apiRequest<GenerationData[]>(`/api/spaces/${spaceId}/generations`, { signal });
+export async function listGenerations(
+  spaceId: string,
+  signal?: AbortSignal,
+): Promise<GenerationData[]> {
+  const { data } = await apiRequest<GenerationData[]>(`/api/spaces/${spaceId}/generations`, {
+    signal,
+  });
   return data;
 }
 
@@ -27,8 +32,11 @@ export async function getGeneration(
   generationId: string,
   signal?: AbortSignal,
 ): Promise<GenerationData> {
-  const { data } = await apiRequest<GenerationData>(`/api/spaces/${spaceId}/generations/${generationId}`, {
-    signal,
-  });
+  const { data } = await apiRequest<GenerationData>(
+    `/api/spaces/${spaceId}/generations/${generationId}`,
+    {
+      signal,
+    },
+  );
   return data;
 }

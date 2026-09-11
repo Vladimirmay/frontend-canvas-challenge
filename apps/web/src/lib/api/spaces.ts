@@ -8,7 +8,11 @@ export async function listSpaces(signal?: AbortSignal): Promise<SpaceData[]> {
 }
 
 export async function createSpace(title: string, signal?: AbortSignal): Promise<SpaceData> {
-  const { data } = await apiRequest<SpaceData>('/api/spaces', { method: 'POST', body: { title }, signal });
+  const { data } = await apiRequest<SpaceData>('/api/spaces', {
+    method: 'POST',
+    body: { title },
+    signal,
+  });
   return data;
 }
 

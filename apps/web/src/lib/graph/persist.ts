@@ -8,7 +8,11 @@ import type { CanvasEdge, CanvasNode } from './types';
  * intermediate filtered/mapped arrays and no cross-referencing lookups — see apps/web/README.md
  * for the call-frequency/pass-count/allocation write-up this function is the subject of.
  */
-export function toPersistedGraph(nodes: CanvasNode[], edges: CanvasEdge[], viewport: Viewport): GraphData {
+export function toPersistedGraph(
+  nodes: CanvasNode[],
+  edges: CanvasEdge[],
+  viewport: Viewport,
+): GraphData {
   return {
     nodes: nodes.map(toPersistedNode),
     edges: edges.map((edge) => ({ id: edge.id, source: edge.source, target: edge.target })),
@@ -31,21 +35,51 @@ export function fromPersistedGraph(graph: GraphData): {
 function toPersistedNode(node: CanvasNode): NodeData {
   switch (node.type) {
     case 'prompt':
-      return { id: node.id, type: 'prompt', position: node.position, data: { text: node.data.text } };
+      return {
+        id: node.id,
+        type: 'prompt',
+        position: node.position,
+        data: { text: node.data.text },
+      };
     case 'generator':
-      return { id: node.id, type: 'generator', position: node.position, data: { label: node.data.label } };
+      return {
+        id: node.id,
+        type: 'generator',
+        position: node.position,
+        data: { label: node.data.label },
+      };
     case 'result':
-      return { id: node.id, type: 'result', position: node.position, data: { label: node.data.label } };
+      return {
+        id: node.id,
+        type: 'result',
+        position: node.position,
+        data: { label: node.data.label },
+      };
   }
 }
 
 function fromPersistedNode(node: NodeData): CanvasNode {
   switch (node.type) {
     case 'prompt':
-      return { id: node.id, type: 'prompt', position: node.position, data: { text: node.data.text } };
+      return {
+        id: node.id,
+        type: 'prompt',
+        position: node.position,
+        data: { text: node.data.text },
+      };
     case 'generator':
-      return { id: node.id, type: 'generator', position: node.position, data: { label: node.data.label } };
+      return {
+        id: node.id,
+        type: 'generator',
+        position: node.position,
+        data: { label: node.data.label },
+      };
     case 'result':
-      return { id: node.id, type: 'result', position: node.position, data: { label: node.data.label } };
+      return {
+        id: node.id,
+        type: 'result',
+        position: node.position,
+        data: { label: node.data.label },
+      };
   }
 }

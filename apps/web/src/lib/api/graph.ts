@@ -11,7 +11,9 @@ export interface GraphSnapshot {
 }
 
 export async function getGraph(spaceId: string, signal?: AbortSignal): Promise<GraphSnapshot> {
-  const { data, etag, raw } = await apiRequest<GraphData>(`/api/spaces/${spaceId}/graph`, { signal });
+  const { data, etag, raw } = await apiRequest<GraphData>(`/api/spaces/${spaceId}/graph`, {
+    signal,
+  });
   if (!etag) throw new ApiError('MISSING_ETAG', 'Сервер не вернул ETag графа.');
   return { graph: data, etag, raw };
 }

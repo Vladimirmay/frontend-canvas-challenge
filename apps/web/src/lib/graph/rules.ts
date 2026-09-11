@@ -14,12 +14,16 @@ export function buildNodeIndex(nodes: CanvasNode[]): Map<string, CanvasNode> {
 }
 
 /** One pass over edges; call once per `edges` reference change (e.g. via useMemo), not per drag tick. */
-export function buildDegreeIndex(edges: CanvasEdge[], nodesById: Map<string, CanvasNode>): DegreeIndex {
+export function buildDegreeIndex(
+  edges: CanvasEdge[],
+  nodesById: Map<string, CanvasNode>,
+): DegreeIndex {
   const edgesByTarget = new Map<string, string>();
   const generatorOutEdge = new Map<string, string>();
   for (const edge of edges) {
     edgesByTarget.set(edge.target, edge.id);
-    if (nodesById.get(edge.source)?.type === 'generator') generatorOutEdge.set(edge.source, edge.id);
+    if (nodesById.get(edge.source)?.type === 'generator')
+      generatorOutEdge.set(edge.source, edge.id);
   }
   return { edgesByTarget, generatorOutEdge };
 }
@@ -39,7 +43,8 @@ export function isValidConnection(
   nodesById: Map<string, CanvasNode>,
   degreeIndex: DegreeIndex,
 ): boolean {
-  if (!connection.source || !connection.target || connection.source === connection.target) return false;
+  if (!connection.source || !connection.target || connection.source === connection.target)
+    return false;
   const source = nodesById.get(connection.source);
   const target = nodesById.get(connection.target);
   if (!source || !target) return false;
