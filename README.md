@@ -13,7 +13,7 @@
 Потребуются Node.js 24.x и npm 11.x. База данных и ключи внешних сервисов не нужны.
 
 ```sh
-git clone https://github.com/instatdigital/frontend-canvas-challenge.git
+git clone https://github.com/Vladimirmay/frontend-canvas-challenge.git
 cd frontend-canvas-challenge
 npm ci
 npm run dev
