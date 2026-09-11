@@ -20,7 +20,9 @@ export function Toolbar() {
   const addNode = (type: string) => {
     if (atCapacity) return;
     const offset = (graph.nodes.length * 48) % 400;
-    graphController.addNode(createNode(type as CanvasNode['type'], { x: 80 + offset, y: 80 + offset }));
+    graphController.addNode(
+      createNode(type as CanvasNode['type'], { x: 80 + offset, y: 80 + offset }),
+    );
   };
 
   return (

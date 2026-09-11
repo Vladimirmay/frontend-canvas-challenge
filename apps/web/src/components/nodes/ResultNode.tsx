@@ -2,12 +2,16 @@ import { Handle, Position, type NodeProps } from '@xyflow/react';
 import { useSpace } from '../../features/space/SpaceProvider';
 import type { ResultCanvasNode } from '../../lib/graph/types';
 
-const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL as string | undefined) ?? 'http://127.0.0.1:4001';
+const API_BASE_URL =
+  (import.meta.env.VITE_API_BASE_URL as string | undefined) ?? 'http://127.0.0.1:4001';
 
 export function ResultNode({ id, data }: NodeProps<ResultCanvasNode>) {
   const { resultsByNode } = useSpace();
   const generation = resultsByNode.get(id);
-  const imageUrl = generation?.status === 'succeeded' && generation.imageUrl ? `${API_BASE_URL}${generation.imageUrl}` : null;
+  const imageUrl =
+    generation?.status === 'succeeded' && generation.imageUrl
+      ? `${API_BASE_URL}${generation.imageUrl}`
+      : null;
 
   return (
     <div className="canvas-node canvas-node--result">

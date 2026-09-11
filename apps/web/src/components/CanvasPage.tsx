@@ -1,12 +1,24 @@
 import { useCallback, useMemo } from 'react';
-import { ReactFlow, ReactFlowProvider, Background, Controls, type Connection, type Viewport } from '@xyflow/react';
+import {
+  ReactFlow,
+  ReactFlowProvider,
+  Background,
+  Controls,
+  type Connection,
+  type Viewport,
+} from '@xyflow/react';
 import { useSpace } from '../features/space/SpaceProvider';
 import { PromptNode } from './nodes/PromptNode';
 import { GeneratorNode } from './nodes/GeneratorNode';
 import { ResultNode } from './nodes/ResultNode';
 import { ErrorBanner } from './ErrorBanner';
 import { Toolbar } from './Toolbar';
-import { buildDegreeIndex, buildNodeIndex, canAddEdge, isValidConnection } from '../lib/graph/rules';
+import {
+  buildDegreeIndex,
+  buildNodeIndex,
+  canAddEdge,
+  isValidConnection,
+} from '../lib/graph/rules';
 
 const nodeTypes = { prompt: PromptNode, generator: GeneratorNode, result: ResultNode };
 
@@ -14,18 +26,26 @@ function CanvasSurface() {
   const { config, graph, graphController } = useSpace();
 
   const nodesById = useMemo(() => buildNodeIndex(graph.nodes), [graph.nodes]);
-  const degreeIndex = useMemo(() => buildDegreeIndex(graph.edges, nodesById), [graph.edges, nodesById]);
+  const degreeIndex = useMemo(
+    () => buildDegreeIndex(graph.edges, nodesById),
+    [graph.edges, nodesById],
+  );
 
   const handleIsValidConnection = useCallback(
     (connection: Connection | { source: string | null; target: string | null }) =>
-      canAddEdge(graph.edges.length, config.maxEdges) && isValidConnection(connection, nodesById, degreeIndex),
+      canAddEdge(graph.edges.length, config.maxEdges) &&
+      isValidConnection(connection, nodesById, degreeIndex),
     [graph.edges.length, config.maxEdges, nodesById, degreeIndex],
   );
 
   const handleConnect = useCallback(
     (connection: Connection) => {
       if (!connection.source || !connection.target) return;
-      graphController.addEdge({ id: crypto.randomUUID(), source: connection.source, target: connection.target });
+      graphController.addEdge({
+        id: crypto.randomUUID(),
+        source: connection.source,
+        target: connection.target,
+      });
     },
     [graphController],
   );

@@ -60,7 +60,12 @@ export function GeneratorNode({ id, data }: NodeProps<GeneratorCanvasNode>) {
           Отказ
         </label>
       </fieldset>
-      <button type="button" className="canvas-node__button" disabled={busy} onClick={() => generate(id, scenario)}>
+      <button
+        type="button"
+        className="canvas-node__button"
+        disabled={busy}
+        onClick={() => generate(id, scenario)}
+      >
         Сгенерировать
       </button>
       <StatusBadge label={presentation.label} tone={presentation.tone} />
