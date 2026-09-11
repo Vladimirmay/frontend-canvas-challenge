@@ -1,0 +1,259 @@
+:root {
+  color-scheme: light;
+  --color-bg: #f4f5f7;
+  --color-surface: #ffffff;
+  --color-border: #d7dbe0;
+  --color-text: #1a1d23;
+  --color-muted: #5b6270;
+  --color-accent: #2f6fed;
+  --color-success: #1a8a4a;
+  --color-progress: #b5810a;
+  --color-error: #c53030;
+  --radius: 8px;
+  font-family:
+    system-ui,
+    -apple-system,
+    'Segoe UI',
+    sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--color-bg);
+  color: var(--color-text);
+}
+
+button,
+input,
+textarea {
+  font: inherit;
+  color: inherit;
+}
+
+button {
+  cursor: pointer;
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  border-radius: var(--radius);
+  padding: 0.5rem 0.9rem;
+}
+
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+button:hover:not(:disabled) {
+  border-color: var(--color-accent);
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+.app {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.app__back {
+  align-self: flex-start;
+  margin: 0.75rem;
+}
+
+.space-provider__loading {
+  padding: 2rem;
+}
+
+/* Space picker */
+.space-picker {
+  max-width: 32rem;
+  margin: 3rem auto;
+  padding: 0 1rem;
+}
+
+.space-picker__form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  margin: 1rem 0 1.5rem;
+}
+
+.space-picker__form input {
+  padding: 0.5rem 0.6rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+}
+
+.space-picker__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.space-picker__list button {
+  width: 100%;
+  text-align: left;
+}
+
+/* Canvas */
+.canvas-surface {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.canvas-surface--loading {
+  padding: 2rem;
+}
+
+.canvas-surface .react-flow {
+  flex: 1;
+}
+
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.6rem 1rem;
+  border-bottom: 1px solid var(--color-border);
+  background: var(--color-surface);
+}
+
+.toolbar__actions {
+  display: flex;
+  gap: 0.4rem;
+}
+
+.toolbar__status {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-left: auto;
+}
+
+.toolbar__count {
+  color: var(--color-muted);
+  font-size: 0.85rem;
+}
+
+/* Status badge */
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.2rem 0.6rem;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  background: #eceff3;
+  color: var(--color-muted);
+}
+
+.status-badge--progress {
+  background: #fff3d6;
+  color: var(--color-progress);
+}
+
+.status-badge--success {
+  background: #e2f6ea;
+  color: var(--color-success);
+}
+
+.status-badge--error {
+  background: #fbe4e4;
+  color: var(--color-error);
+}
+
+/* Error banner */
+.error-banner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--color-error);
+  border-radius: var(--radius);
+  background: #fdf0f0;
+  color: var(--color-error);
+  width: 100%;
+}
+
+.error-banner__action {
+  border-color: var(--color-error);
+  color: var(--color-error);
+  background: var(--color-surface);
+}
+
+/* Nodes */
+.canvas-node {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0.75rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  background: var(--color-surface);
+  width: 15rem;
+}
+
+.canvas-node__label {
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.canvas-node__textarea {
+  resize: vertical;
+  min-height: 4.5rem;
+  padding: 0.4rem 0.5rem;
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+}
+
+.canvas-node__scenario {
+  display: flex;
+  gap: 0.75rem;
+  border: none;
+  padding: 0;
+  margin: 0;
+  font-size: 0.85rem;
+}
+
+.canvas-node__scenario legend {
+  font-size: 0.75rem;
+  color: var(--color-muted);
+  padding: 0;
+}
+
+.canvas-node__scenario label {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.canvas-node__placeholder {
+  color: var(--color-muted);
+  font-size: 0.85rem;
+}
+
+.canvas-node__image {
+  width: 100%;
+  border-radius: 6px;
+  display: block;
+}
