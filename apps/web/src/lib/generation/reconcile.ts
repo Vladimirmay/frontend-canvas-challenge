@@ -1,10 +1,5 @@
 import type { GenerationData } from '@canvas/contracts';
 
-/**
- * One pass over the already-newest-first generations list: for each generator/result pair,
- * keeps only the most recent attempt and drops anything superseded or pointing at a node that
- * no longer exists — so a stale result can never render into the wrong (or a since-deleted) node.
- */
 export function pickCurrentGenerations(
   generationsNewestFirst: GenerationData[],
   nodeIds: Set<string>,

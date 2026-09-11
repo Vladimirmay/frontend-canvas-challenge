@@ -22,11 +22,6 @@ function delay(ms: number, signal?: AbortSignal): Promise<void> {
   });
 }
 
-/**
- * Generic "fetch, check, wait, repeat" loop reused for every polling need in the app (currently
- * generation status). `fetchOnce` should go through the shared `apiRequest` chokepoint so
- * cancellation and error normalization stay consistent with every other call.
- */
 export async function pollUntilSettled<T>(
   fetchOnce: (signal: AbortSignal | undefined) => Promise<T>,
   { intervalMs, isSettled, signal }: PollOptions<T>,

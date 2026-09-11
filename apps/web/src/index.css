@@ -77,7 +77,6 @@ button:hover:not(:disabled) {
   padding: 2rem;
 }
 
-/* Space picker */
 .space-picker {
   max-width: 32rem;
   margin: 3rem auto;
@@ -111,7 +110,6 @@ button:hover:not(:disabled) {
   text-align: left;
 }
 
-/* Canvas */
 .canvas-surface {
   flex: 1;
   display: flex;
@@ -154,7 +152,6 @@ button:hover:not(:disabled) {
   font-size: 0.85rem;
 }
 
-/* Status badge */
 .status-badge {
   display: inline-flex;
   align-items: center;
@@ -181,7 +178,6 @@ button:hover:not(:disabled) {
   color: var(--color-error);
 }
 
-/* Error banner */
 .error-banner {
   display: flex;
   flex-wrap: wrap;
@@ -201,7 +197,6 @@ button:hover:not(:disabled) {
   background: var(--color-surface);
 }
 
-/* Nodes */
 .canvas-node {
   display: flex;
   flex-direction: column;

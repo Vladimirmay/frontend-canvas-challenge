@@ -2,12 +2,6 @@ import type { GraphData, NodeData } from '@canvas/contracts';
 import type { Viewport } from '@xyflow/react';
 import type { CanvasEdge, CanvasNode } from './types';
 
-/**
- * Maps React Flow's runtime nodes/edges (which carry `selected`, `dragging`, `measured`, event
- * handlers, etc.) to exactly the wire shape the server accepts. One pass per array, no
- * intermediate filtered/mapped arrays and no cross-referencing lookups — see apps/web/README.md
- * for the call-frequency/pass-count/allocation write-up this function is the subject of.
- */
 export function toPersistedGraph(
   nodes: CanvasNode[],
   edges: CanvasEdge[],

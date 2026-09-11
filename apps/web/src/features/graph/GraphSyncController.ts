@@ -20,7 +20,6 @@ export interface GraphSnapshot {
   viewport: Viewport;
   saveStatus: SaveStatus;
   error: ApiError | null;
-  /** Set only on a genuine version conflict; cleared only by an explicit resolveConflict call. */
   conflict: boolean;
   ready: boolean;
 }
@@ -29,13 +28,6 @@ type Listener = () => void;
 
 const EMPTY_VIEWPORT: Viewport = { x: 0, y: 0, zoom: 1 };
 
-/**
- * Owns one space's graph state end-to-end: loading, local mutation, debounced saving, and the
- * ETag/conflict/lost-response bookkeeping from docs/INTEGRATION.md. Implemented as a plain
- * class (not hooks) because the save invariant — at most one PUT in flight, later edits always
- * get coalesced into exactly one follow-up PUT — is an inherently sequential process that is
- * easy to get subtly wrong with stale closures; `useGraphSync` subscribes to it for rendering.
- */
 export class GraphSyncController {
   private nodes: CanvasNode[] = [];
   private edges: CanvasEdge[] = [];
@@ -116,9 +108,6 @@ export class GraphSyncController {
   onNodesChange(changes: NodeChange<CanvasNode>[]): void {
     if (!this.ready) return;
     this.nodes = applyNodeChanges(changes, this.nodes);
-    // React Flow also reports pure layout events (measured dimensions, selection) through this
-    // callback; only a real structural/position change should mark the graph dirty and schedule
-    // a save, or e.g. an image loading into a result node would trigger a needless PUT.
     this.applyChange(
       changes.some((change) => change.type !== 'dimensions' && change.type !== 'select'),
     );
@@ -165,7 +154,6 @@ export class GraphSyncController {
     this.applyChange(true);
   }
 
-  /** Single place deciding whether a local mutation is persisted (dirty + debounced save) or purely visual. */
   private applyChange(isPersistedChange: boolean): void {
     if (isPersistedChange) {
       this.dirty = true;
@@ -175,7 +163,6 @@ export class GraphSyncController {
     if (isPersistedChange) this.debouncer.trigger();
   }
 
-  /** Cancels any pending debounce and saves immediately; used before starting a generation. */
   async flush(): Promise<SaveResult> {
     if (!this.ready)
       return { ok: false, error: new ApiError('GRAPH_NOT_READY', 'Граф ещё не загружен.') };
@@ -183,7 +170,6 @@ export class GraphSyncController {
     return this.ensureSaved();
   }
 
-  /** Discards the local draft and reloads the server's current graph after a 412 conflict. */
   resolveConflict(): void {
     if (this.conflictDraft === null) return;
     this.conflictDraft = null;
@@ -195,13 +181,6 @@ export class GraphSyncController {
     this.listeners.clear();
   }
 
-  /**
-   * The only entry point that issues a PUT. Concurrent callers (debounce firing while a caller
-   * also explicitly flushes) share the same in-flight loop rather than racing two PUTs: the
-   * `driver` field guards that at most one loop — and therefore at most one PUT — runs at a
-   * time, and each iteration re-checks `dirty` against the latest edits before deciding whether
-   * another save is needed.
-   */
   private ensureSaved(): Promise<SaveResult> {
     if (this.driver) return this.driver;
     const loop = this.runSaveLoop().finally(() => {
@@ -225,7 +204,6 @@ export class GraphSyncController {
       if (!this.dirty) return { ok: true };
       const result = await this.doSave();
       if (!result.ok) return result;
-      // Loop back: edits that arrived while doSave() was in flight left `dirty` true again.
     }
   }
 
@@ -266,13 +244,6 @@ export class GraphSyncController {
     }
   }
 
-  /**
-   * The PUT's response never arrived, but it may have reached the server anyway. Re-reads the
-   * graph and compares raw bytes: identical means our write landed and the response was merely
-   * lost (safe to adopt). If the server moved to a version we didn't base our edit on, that is a
-   * real conflict — surfaced exactly like a 412, never silently retried, so a lost response can
-   * never end up clobbering someone else's concurrent save.
-   */
   private async recoverFromLostResponse(
     sentRaw: string,
     sentEtag: string,
@@ -288,7 +259,6 @@ export class GraphSyncController {
         return { ok: true };
       }
       if (server.etag === sentEtag) {
-        // Server is exactly where we left it — our write truly never applied; safe to retry as-is.
         this.dirty = true;
         this.error = original;
         this.saveStatus = 'error';

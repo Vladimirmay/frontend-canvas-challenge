@@ -1,7 +1,6 @@
 import type { SpaceData } from '@canvas/contracts';
 import { apiRequest } from './client';
 
-/** Already newest-first from the server — do not re-sort. */
 export async function listSpaces(signal?: AbortSignal): Promise<SpaceData[]> {
   const { data } = await apiRequest<SpaceData[]>('/api/spaces', { signal });
   return data;

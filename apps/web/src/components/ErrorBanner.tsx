@@ -1,8 +1,3 @@
-/**
- * The single error-display primitive: every feature (save conflicts, generation failures,
- * network errors) renders its already-parsed message through this component instead of a
- * bespoke banner per feature.
- */
 export function ErrorBanner({
   message,
   actionLabel,

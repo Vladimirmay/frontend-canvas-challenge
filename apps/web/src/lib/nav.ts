@@ -11,7 +11,6 @@ export function setSpaceIdInUrl(spaceId: string | null): void {
   window.history.pushState({}, '', url);
 }
 
-/** Fires on back/forward navigation; returns an unsubscribe function. */
 export function onSpaceRouteChange(listener: () => void): () => void {
   window.addEventListener('popstate', listener);
   return () => window.removeEventListener('popstate', listener);

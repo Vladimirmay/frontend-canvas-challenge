@@ -6,9 +6,7 @@ const BASE_URL =
 
 export interface ApiRequestOptions {
   method?: 'GET' | 'POST' | 'PUT';
-  /** JSON-serializable body; stringified once here. Use `rawBody` when the exact bytes matter. */
   body?: unknown;
-  /** Pre-serialized body sent verbatim (needed where byte-exact ETag semantics matter). */
   rawBody?: string;
   headers?: Record<string, string>;
   signal?: AbortSignal;
@@ -16,9 +14,7 @@ export interface ApiRequestOptions {
 
 export interface ApiResponse<T> {
   data: T;
-  /** ETag response header, if present. */
   etag: string | null;
-  /** Exact response body text (empty for 204/304), for callers that need byte-level comparison. */
   raw: string;
   response: Response;
 }
@@ -27,11 +23,6 @@ interface ErrorBody {
   error?: { code?: string; message?: string };
 }
 
-/**
- * The single chokepoint for every HTTP call the app makes: URL/header construction, JSON
- * parsing, and error normalization all happen here exactly once. Callers always get parsed
- * data or a thrown ApiError — never a raw Response or a bespoke try/catch around fetch.
- */
 export async function apiRequest<T>(
   path: string,
   options: ApiRequestOptions = {},

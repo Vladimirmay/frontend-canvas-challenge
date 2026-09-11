@@ -4,9 +4,7 @@ import { ApiError } from './errors';
 
 export interface GraphSnapshot {
   graph: GraphData;
-  /** Byte-exact, quoted ETag as returned by the server — never computed client-side. */
   etag: string;
-  /** Exact response body text, for byte-level comparison during lost-response recovery. */
   raw: string;
 }
 
@@ -18,11 +16,6 @@ export async function getGraph(spaceId: string, signal?: AbortSignal): Promise<G
   return { graph: data, etag, raw };
 }
 
-/**
- * `rawBody` must be the exact JSON text to send (built once by the caller via
- * `toPersistedGraph` + `JSON.stringify`) so the caller can later byte-compare it against what
- * the server reports, per the lost-response recovery rule in docs/INTEGRATION.md.
- */
 export async function putGraph(
   spaceId: string,
   rawBody: string,

@@ -1,7 +1,6 @@
 import type { GenerationData, GenerationRequest } from '@canvas/contracts';
 import { apiRequest } from './client';
 
-/** Already newest-first from the server — do not re-sort. */
 export async function listGenerations(
   spaceId: string,
   signal?: AbortSignal,

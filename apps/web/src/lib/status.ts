@@ -7,7 +7,6 @@ export interface StatusPresentation {
   tone: StatusTone;
 }
 
-/** One place mapping save state to a label/tone — reused by the toolbar and any future consumer. */
 export function saveStatusPresentation(status: SaveStatus): StatusPresentation {
   switch (status) {
     case 'loading':
@@ -23,7 +22,6 @@ export function saveStatusPresentation(status: SaveStatus): StatusPresentation {
   }
 }
 
-/** Same idea as `saveStatusPresentation`, for a generator node's attempt state. */
 export function attemptStatusPresentation(status: AttemptState['status']): StatusPresentation {
   switch (status) {
     case 'idle':

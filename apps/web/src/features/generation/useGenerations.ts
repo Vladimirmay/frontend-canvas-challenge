@@ -13,7 +13,6 @@ export interface AttemptState {
   status: 'idle' | 'submitting' | 'processing' | 'succeeded' | 'failed' | 'error';
   generation: GenerationData | null;
   error: ApiError | null;
-  /** Only set after a network error on the POST itself — reusing the same key/body is safe. */
   retryableKey: string | null;
   retryableBody: GenerationRequest | null;
 }
@@ -28,11 +27,6 @@ const IDLE_ATTEMPT: AttemptState = {
 
 type Listener = () => void;
 
-/**
- * Space-scoped manager for per-generator-node generation attempts: submit/retry/poll and
- * reload-time reconciliation, all funneled through the shared API layer and the graph
- * controller's flush() so no component re-implements this sequencing itself.
- */
 class GenerationsController {
   private attempts = new Map<string, AttemptState>();
   private readonly submitting = new Set<string>();
@@ -69,9 +63,6 @@ class GenerationsController {
 
   private async restore(): Promise<void> {
     try {
-      // The graph loads concurrently with this restore; wait for it so nodeIds reflects the
-      // actual graph instead of the pre-load empty node list, which would drop every
-      // restored generation as "pointing at a node that doesn't exist".
       await this.graphSync.ready$;
       const nodeIds = new Set(this.graphSync.getSnapshot().nodes.map((node) => node.id));
       const generations = await listGenerations(this.spaceId, this.abort.signal);
@@ -87,9 +78,7 @@ class GenerationsController {
         if (generation.status === 'processing') void this.trackUntilSettled(nodeId, generation.id);
       }
       this.emit();
-    } catch {
-      // Non-fatal: the canvas still works without restored generation history.
-    }
+    } catch {}
   }
 
   async generate(nodeId: string, scenario: Scenario): Promise<void> {
@@ -123,7 +112,6 @@ class GenerationsController {
     await this.submit(nodeId, key, body);
   }
 
-  /** Resend the exact key/body of a POST whose response was lost to a network error. */
   async retryAfterNetworkError(nodeId: string): Promise<void> {
     const current = this.attempts.get(nodeId);
     if (!current?.retryableKey || !current.retryableBody || this.submitting.has(nodeId)) return;
@@ -202,9 +190,6 @@ export function useGenerations(
   graphSync: GraphSyncController,
   pollIntervalMs: number,
 ) {
-  // Created and destroyed inside the same effect (never via useMemo) so that React StrictMode's
-  // mount -> cleanup -> remount simulation can't leave a live component holding an instance
-  // whose AbortController was already irreversibly aborted by the first cleanup.
   const [controller, setController] = useState<GenerationsController | null>(null);
 
   useEffect(() => {
