@@ -116,25 +116,30 @@ export class GraphSyncController {
   onNodesChange(changes: NodeChange<CanvasNode>[]): void {
     if (!this.ready) return;
     this.nodes = applyNodeChanges(changes, this.nodes);
-    this.markDirty();
+    // React Flow also reports pure layout events (measured dimensions, selection) through this
+    // callback; only a real structural/position change should mark the graph dirty and schedule
+    // a save, or e.g. an image loading into a result node would trigger a needless PUT.
+    this.applyChange(
+      changes.some((change) => change.type !== 'dimensions' && change.type !== 'select'),
+    );
   }
 
   onEdgesChange(changes: EdgeChange<CanvasEdge>[]): void {
     if (!this.ready) return;
     this.edges = applyEdgeChanges(changes, this.edges);
-    this.markDirty();
+    this.applyChange(changes.some((change) => change.type !== 'select'));
   }
 
   addNode(node: CanvasNode): void {
     if (!this.ready) return;
     this.nodes = [...this.nodes, node];
-    this.markDirty();
+    this.applyChange(true);
   }
 
   addEdge(edge: CanvasEdge): void {
     if (!this.ready) return;
     this.edges = [...this.edges, edge];
-    this.markDirty();
+    this.applyChange(true);
   }
 
   updateNodeData(nodeId: string, data: Partial<PromptData & LabelData>): void {
@@ -142,7 +147,7 @@ export class GraphSyncController {
     this.nodes = this.nodes.map((node) =>
       node.id === nodeId ? ({ ...node, data: { ...node.data, ...data } } as CanvasNode) : node,
     );
-    this.markDirty();
+    this.applyChange(true);
   }
 
   removeNodesCascade(deletedIds: Set<string>): void {
@@ -151,20 +156,23 @@ export class GraphSyncController {
     this.edges = this.edges.filter(
       (edge) => !deletedIds.has(edge.source) && !deletedIds.has(edge.target),
     );
-    this.markDirty();
+    this.applyChange(true);
   }
 
   setViewport(viewport: Viewport): void {
     if (!this.ready) return;
     this.viewport = viewport;
-    this.markDirty();
+    this.applyChange(true);
   }
 
-  private markDirty(): void {
-    this.dirty = true;
-    if (this.saveStatus !== 'saving') this.saveStatus = 'unsaved';
+  /** Single place deciding whether a local mutation is persisted (dirty + debounced save) or purely visual. */
+  private applyChange(isPersistedChange: boolean): void {
+    if (isPersistedChange) {
+      this.dirty = true;
+      if (this.saveStatus !== 'saving') this.saveStatus = 'unsaved';
+    }
     this.emit();
-    this.debouncer.trigger();
+    if (isPersistedChange) this.debouncer.trigger();
   }
 
   /** Cancels any pending debounce and saves immediately; used before starting a generation. */

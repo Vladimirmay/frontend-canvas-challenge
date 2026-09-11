@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useSyncExternalStore } from 'react';
+import { useCallback, useEffect, useState, useSyncExternalStore } from 'react';
 import type { GenerationData, GenerationRequest } from '@canvas/contracts';
 import { createGeneration, getGeneration, listGenerations } from '../../lib/api/generations';
 import { ApiError, toApiError } from '../../lib/api/errors';
@@ -69,6 +69,10 @@ class GenerationsController {
 
   private async restore(): Promise<void> {
     try {
+      // The graph loads concurrently with this restore; wait for it so nodeIds reflects the
+      // actual graph instead of the pre-load empty node list, which would drop every
+      // restored generation as "pointing at a node that doesn't exist".
+      await this.graphSync.ready$;
       const nodeIds = new Set(this.graphSync.getSnapshot().nodes.map((node) => node.id));
       const generations = await listGenerations(this.spaceId, this.abort.signal);
       const current = pickCurrentGenerations(generations, nodeIds);
@@ -189,26 +193,37 @@ class GenerationsController {
   }
 }
 
+const EMPTY_ATTEMPTS: ReadonlyMap<string, AttemptState> = new Map();
+const noopSubscribe = () => () => {};
+const getEmptyAttempts = () => EMPTY_ATTEMPTS;
+
 export function useGenerations(
   spaceId: string,
   graphSync: GraphSyncController,
   pollIntervalMs: number,
 ) {
-  const controller = useMemo(
-    () => new GenerationsController(spaceId, graphSync, pollIntervalMs),
-    [spaceId, graphSync, pollIntervalMs],
+  // Created and destroyed inside the same effect (never via useMemo) so that React StrictMode's
+  // mount -> cleanup -> remount simulation can't leave a live component holding an instance
+  // whose AbortController was already irreversibly aborted by the first cleanup.
+  const [controller, setController] = useState<GenerationsController | null>(null);
+
+  useEffect(() => {
+    const next = new GenerationsController(spaceId, graphSync, pollIntervalMs);
+    setController(next);
+    return () => next.destroy();
+  }, [spaceId, graphSync, pollIntervalMs]);
+
+  const attempts = useSyncExternalStore(
+    controller ? controller.subscribe : noopSubscribe,
+    controller ? controller.getSnapshot : getEmptyAttempts,
   );
 
-  useEffect(() => () => controller.destroy(), [controller]);
-
-  const attempts = useSyncExternalStore(controller.subscribe, controller.getSnapshot);
-
   const generate = useCallback(
-    (nodeId: string, scenario: Scenario) => controller.generate(nodeId, scenario),
+    (nodeId: string, scenario: Scenario) => controller?.generate(nodeId, scenario),
     [controller],
   );
   const retryAfterNetworkError = useCallback(
-    (nodeId: string) => controller.retryAfterNetworkError(nodeId),
+    (nodeId: string) => controller?.retryAfterNetworkError(nodeId),
     [controller],
   );
 

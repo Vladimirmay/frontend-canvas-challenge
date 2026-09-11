@@ -9,7 +9,7 @@ interface SpaceContextValue {
   config: AppConfig;
   graph: GraphSnapshot;
   graphController: GraphSyncController;
-  attempts: Map<string, AttemptState>;
+  attempts: ReadonlyMap<string, AttemptState>;
   /** Generation keyed by the result node it belongs to — O(1) lookup for ResultNode. */
   resultsByNode: Map<string, GenerationData>;
   generate: (nodeId: string, scenario: Scenario) => void;
